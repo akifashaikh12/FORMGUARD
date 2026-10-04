@@ -1,0 +1,288 @@
+/**
+ * FORMGUARD application templates.
+ *
+ * These are demo templates. They are used in the UI clearly labelled as "Demo
+ * application template" and are never presented to the user as live government
+ * or institutional data. Real applications would configure their own templates.
+ *
+ * All byte limits use 1 KB = 1024 bytes, consistent with `src/lib/engines/format.ts`.
+ */
+
+import type { ApplicationTemplate } from "@/lib/types";
+
+const stateScholarship: ApplicationTemplate = {
+  id: "state-scholarship",
+  name: "State Scholarship Application",
+  category: "Scholarship",
+  description:
+    "Demo application template for a state scholarship programme. This is a demo configuration, not a real scholarship portal.",
+  deadline: "2026-10-25T23:59:00+05:30",
+  isDemo: true,
+  documents: [
+    {
+      id: "aadhaar",
+      label: "Aadhaar Card",
+      description: "Your government-issued Aadhaar identity card.",
+      allowedFormats: ["pdf", "jpg"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: ["aadhaar", "aadhar", "uid"],
+      suggestedFilename: "aadhaar.pdf",
+      isImage: false,
+    },
+    {
+      id: "income-certificate",
+      label: "Income Certificate",
+      description: "Certificate confirming your family income.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: ["income", "certificate", "salary"],
+      suggestedFilename: "income_certificate.pdf",
+      isImage: false,
+    },
+    {
+      id: "marksheet",
+      label: "Marksheet",
+      description: "Your academic marksheet or result card.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: ["marksheet", "mark", "sheet", "result", "grade"],
+      suggestedFilename: "marksheet.pdf",
+      isImage: false,
+    },
+    {
+      id: "bank-passbook",
+      label: "Bank Passbook",
+      description: "A page from your bank passbook showing your account details.",
+      allowedFormats: ["pdf", "jpg"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: ["bank", "passbook", "account"],
+      suggestedFilename: "bank_passbook.pdf",
+      isImage: false,
+    },
+    {
+      id: "photograph",
+      label: "Photograph",
+      description: "A recent passport-style photograph.",
+      allowedFormats: ["jpg"],
+      maxBytes: 50 * 1024,
+      minBytes: 5 * 1024,
+      minWidth: 100,
+      minHeight: 100,
+      keywords: ["photo", "photograph", "passport", "pic"],
+      suggestedFilename: "photograph.jpg",
+      isImage: true,
+    },
+    {
+      id: "signature",
+      label: "Signature",
+      description: "Your signature on white paper.",
+      allowedFormats: ["jpg"],
+      maxBytes: 20 * 1024,
+      minWidth: 100,
+      minHeight: 40,
+      keywords: ["signature", "sign"],
+      suggestedFilename: "signature.jpg",
+      isImage: true,
+    },
+    {
+      id: "caste-certificate",
+      label: "Caste Certificate",
+      description: "Certificate confirming your caste or category.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: ["caste", "category", "certificate"],
+      suggestedFilename: "caste_certificate.pdf",
+      isImage: false,
+    },
+  ],
+};
+
+const collegeAdmission: ApplicationTemplate = {
+  id: "college-admission",
+  name: "College Admission Application",
+  category: "Admission",
+  description:
+    "Demo application template for a college admission process. This is a demo configuration, not a real admissions portal.",
+  deadline: "2026-11-15T23:59:00+05:30",
+  isDemo: true,
+  documents: [
+    {
+      id: "class10-marksheet",
+      label: "Class 10 Marksheet",
+      description: "Your secondary school (Class 10) marksheet.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: [
+        "class 10",
+        "10th",
+        "ten",
+        "ssc",
+        "matric",
+        "marksheet",
+        "result",
+      ],
+      suggestedFilename: "class10_marksheet.pdf",
+      isImage: false,
+    },
+    {
+      id: "class12-marksheet",
+      label: "Class 12 Marksheet",
+      description: "Your higher secondary (Class 12) marksheet.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: [
+        "class 12",
+        "12th",
+        "twelve",
+        "hsc",
+        "marksheet",
+        "result",
+      ],
+      suggestedFilename: "class12_marksheet.pdf",
+      isImage: false,
+    },
+    {
+      id: "photo",
+      label: "Photograph",
+      description: "A recent passport-style photograph.",
+      allowedFormats: ["jpg"],
+      maxBytes: 100 * 1024,
+      minBytes: 10 * 1024,
+      minWidth: 100,
+      minHeight: 100,
+      keywords: ["photo", "photograph", "passport", "pic"],
+      suggestedFilename: "photograph.jpg",
+      isImage: true,
+    },
+    {
+      id: "signature-admission",
+      label: "Signature",
+      description: "Your signature on white paper.",
+      allowedFormats: ["jpg"],
+      maxBytes: 25 * 1024,
+      minWidth: 100,
+      minHeight: 40,
+      keywords: ["signature", "sign"],
+      suggestedFilename: "signature.jpg",
+      isImage: true,
+    },
+    {
+      id: "id-proof",
+      label: "ID Proof",
+      description: "A government-issued identity document.",
+      allowedFormats: ["pdf", "jpg"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: [
+        "aadhaar",
+        "aadhar",
+        "uid",
+        "pan",
+        "passport",
+        "voter",
+        "id",
+        "identity",
+      ],
+      suggestedFilename: "id_proof.pdf",
+      isImage: false,
+    },
+  ],
+};
+
+const competitiveExamination: ApplicationTemplate = {
+  id: "competitive-examination",
+  name: "Competitive Examination Application",
+  category: "Examination",
+  description:
+    "Demo application template for a competitive examination. This is a demo configuration, not a real examination authority.",
+  deadline: "2026-12-01T17:00:00+05:30",
+  isDemo: true,
+  documents: [
+    {
+      id: "photo",
+      label: "Photograph",
+      description: "A recent passport-style photograph.",
+      allowedFormats: ["jpg"],
+      minBytes: 20 * 1024,
+      maxBytes: 50 * 1024,
+      minWidth: 100,
+      minHeight: 100,
+      keywords: ["photo", "photograph", "passport", "pic"],
+      suggestedFilename: "photograph.jpg",
+      isImage: true,
+    },
+    {
+      id: "signature-exam",
+      label: "Signature",
+      description: "Your signature on white paper.",
+      allowedFormats: ["jpg"],
+      minBytes: 10 * 1024,
+      maxBytes: 20 * 1024,
+      minWidth: 100,
+      minHeight: 40,
+      keywords: ["signature", "sign"],
+      suggestedFilename: "signature.jpg",
+      isImage: true,
+    },
+    {
+      id: "id-proof",
+      label: "ID Proof",
+      description: "A government-issued identity document.",
+      allowedFormats: ["pdf", "jpg"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: [
+        "aadhaar",
+        "aadhar",
+        "uid",
+        "pan",
+        "passport",
+        "voter",
+        "id",
+        "identity",
+      ],
+      suggestedFilename: "id_proof.pdf",
+      isImage: false,
+    },
+    {
+      id: "category-certificate",
+      label: "Category Certificate",
+      description: "Certificate confirming your category or reservation status.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: [
+        "category",
+        "caste",
+        "certificate",
+        "reservation",
+      ],
+      suggestedFilename: "category_certificate.pdf",
+      isImage: false,
+    },
+    {
+      id: "graduation-certificate",
+      label: "Graduation Certificate",
+      description: "Your degree or graduation certificate.",
+      allowedFormats: ["pdf"],
+      maxBytes: 2 * 1024 * 1024,
+      keywords: [
+        "graduation",
+        "degree",
+        "bachelor",
+        "master",
+        "certificate",
+        "diploma",
+      ],
+      suggestedFilename: "graduation_certificate.pdf",
+      isImage: false,
+    },
+  ],
+};
+
+export const templates: ApplicationTemplate[] = [
+  stateScholarship,
+  collegeAdmission,
+  competitiveExamination,
+];
+
+export function findTemplateById(id: string): ApplicationTemplate | undefined {
+  return templates.find((t) => t.id === id);
+}
