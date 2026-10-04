@@ -2,13 +2,17 @@
 
 > **Know your application is ready before you click Submit.**
 
-FORMGUARD is a **local-first, fully interactive** pre-submission checker for application documents — scholarships, admissions, exams. Upload your real files, watch them get inspected in real time, fix every issue with one click, and get a clear **READY / NOT READY** result — all inside the browser, with nothing ever sent to a server.
+FORMGUARD is a **local-first, fully interactive** pre-submission checker for
+application documents — scholarships, admissions, exams. Upload your real
+files, watch them get inspected in real time, fix every issue with one click,
+and get a clear **READY / NOT READY** result — all inside the browser, with
+nothing ever sent to a server.
 
 ---
 
 ## What it does (in 30 seconds)
 
-```
+```text
 You drop files  →  FORMGUARD inspects them  →  Issues appear instantly
        ↓                                              ↓
 One-click fix (compress / convert / rename)    Confirm uncertain files
@@ -16,13 +20,16 @@ One-click fix (compress / convert / rename)    Confirm uncertain files
          Live progress bar fills to 100%  →  READY TO SUBMIT ✓
 ```
 
-No uploads. No account. No waiting. The entire pipeline — magic-byte detection, SHA-256 hashing, JPEG compression, PDF-to-image conversion — runs in your browser tab.
+No uploads. No account. No waiting. The entire pipeline — magic-byte detection,
+SHA-256 hashing, JPEG compression, PDF-to-image conversion — runs in your
+browser tab.
 
 ---
 
 ## Live interactive features
 
-These are all **real-time, in-browser** — no round-trips, no server, no delay beyond your CPU:
+These are all **real-time, in-browser** — no round-trips, no server, no delay
+beyond your CPU:
 
 | What you do | What happens |
 |---|---|
@@ -73,7 +80,7 @@ These are all **real-time, in-browser** — no round-trips, no server, no delay 
 
 ## Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                        Browser (client only)                     │
 │                                                                  │
@@ -84,10 +91,12 @@ These are all **real-time, in-browser** — no round-trips, no server, no delay 
 │  │  Select      │   │  loadingSlots  │   │                    │  │
 │  │  Requirements│   │  (Set<id>)     │   │  Canvas API        │  │
 │  │  Upload      │   │                │   │  createImageBitmap │  │
-│  │  Fix         │   └───────┬────────┘   │  crypto.subtle     │  │
-│  │  Readiness   │           │            │  pdfjs-dist        │  │
-│  └──────────────┘   ┌───────▼────────┐   └────────────────────┘  │
-│                     │  Pure Engines  │  ← unit-tested, no DOM    │
+│  │  Fix         │   │                │   │  crypto.subtle     │  │
+│  │  Readiness   │   │                │   │  pdfjs-dist        │  │
+│  └──────────────┘   └───────┬────────┘   └────────────────────┘  │
+│                             │                                    │
+│                     ┌───────▼────────┐                          │
+│                     │  Pure Engines  │  ← unit-tested, no DOM   │
 │                     │  validation.ts │                            │
 │                     │  matching.ts   │                            │
 │                     │  readiness.ts  │                            │
@@ -130,35 +139,34 @@ These are all **real-time, in-browser** — no round-trips, no server, no delay 
 # Install dependencies
 npm install
 
-# Generate demo files (needed for "Try with demo files" button)
-npm run demo-files
-
-# Start the dev server
+# Start the local server (localhost)
 npm run dev
 # → http://localhost:3000
-
-# Run tests
-npm test
-
-# Type-check
-npx tsc --noEmit
-
-# Lint
-npm run lint
-
-# Production build
-npm run build
 ```
+
+Then open `http://localhost:3000` in your browser.
+
+### Available scripts
+
+| Script | What it does |
+|---|---|
+| `npm run dev` | Start the dev server at `http://localhost:3000` |
+| `npm run build` | Production build (`.next/` output) |
+| `npm start` | Serve the production build locally |
+| `npm run lint` | ESLint 9 (`eslint.config.mjs`) |
+| `npm test` | Vitest, run once (`vitest run`) |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run demo-files` | Regenerate demo files into `public/demo-files/` |
 
 ---
 
 ## Demo files
 
-The **"Try with demo files"** button on the Upload screen fetches pre-generated synthetic files from `/public/demo-files/` — no real personal data anywhere.
-
-```bash
-npm run demo-files
-```
+The **"Try with demo files"** button on the Upload screen loads pre-generated
+synthetic files from `/demo-files/`. **Important:** the demo files only resemble
+real input. Filenames, keywords, and non-trivial values are deliberately fake,
+and every demo file is designed to fail in a specific, learning-oriented way —
+so the real behaviour you see on localhost will differ from the demo outcome.
 
 | File | What it tests |
 |---|---|
@@ -170,9 +178,7 @@ npm run demo-files
 | `IMG_8392.jpg` | TOO_LARGE — 1.86 MB photograph must be compressed to ≤ 50 KB |
 | `signature.pdf` | WRONG_FORMAT — 625 KB PDF must be converted + compressed to JPG ≤ 20 KB |
 
-### Golden path
-
-After clicking **"Try with demo files"** on the State Scholarship template:
+### Golden path (against the State Scholarship template, with demo files)
 
 1. 5 files pass immediately → 5 verified cards turn green
 2. `college_document.pdf` → Income Certificate slot → **"Confirm"** button appears inline
@@ -185,11 +191,18 @@ After clicking **"Try with demo files"** on the State Scholarship template:
 9. Navigate to Readiness → **READY TO SUBMIT** · 7/7 · 1 user confirmed · 0 blocking
 10. Click **Download Submission Report** → browser print dialog, A4 layout
 
+> The demo path is a **learning aid**. In real usage you will upload your own
+> files, some of which will fail differently, need different fixes, or be
+> genuinely ambiguous. FORMGUARD will ask you when it cannot determine the
+> answer — you are always in control.
+
 ---
 
 ## Templates
 
-All clearly labelled **"Demo application template"** — never presented as live government or institutional data.
+All templates are **Demo application templates** — they are configuration,
+not live data. They ship so you can try the whole flow without uploading real
+documents. Real applications configure their own templates.
 
 | Template | Documents | Deadline |
 |---|---|---|
@@ -201,7 +214,7 @@ All clearly labelled **"Demo application template"** — never presented as live
 
 ## Project structure
 
-```
+```text
 src/
 ├── app/
 │   ├── layout.tsx          # Root layout — mounts <Toaster />
@@ -226,7 +239,7 @@ src/
     │   ├── validation.ts   # validate(meta, rule, ctx) → Issue[]
     │   ├── matching.ts     # matchFilename() → 'match'|'unclear'|'mismatch'
     │   ├── readiness.ts    # computeReadiness() → ReadinessResult
-    │   ├── format.ts       # formatBytes() helper
+    │   ├── format.ts       # formatBytes() helper (1 KB = 1024)
     │   └── *.test.ts       # 48 Vitest unit tests
     └── browser/            # Client-only, uses DOM/Canvas/pdfjs
         ├── inspect.ts      # inspectFile() — magic bytes, SHA-256, dimensions, pages
@@ -242,11 +255,17 @@ npm test
 ```
 
 48 unit tests covering:
-- Every `validate()` rule (WRONG_FORMAT, TYPE_SPOOF, TOO_LARGE, TOO_SMALL, DIMENSIONS, ENCRYPTED_PDF, PAGES, UNREADABLE, FILENAME, IDENTITY, DUPLICATE)
-- `matchFilename()` — match, unclear, and mismatch cases including `income_certificate.pdf`, `college_document.pdf`, `document1.pdf`, `IMG_8392.jpg`
-- `computeReadiness()` — READY / CONFIRM / NOT_READY truth table, deadline-passed case, userConfirmed count
+- Every `validate()` rule (WRONG_FORMAT, TYPE_SPOOF, TOO_LARGE, TOO_SMALL,
+  DIMENSIONS, ENCRYPTED_PDF, PAGES, UNREADABLE, FILENAME, IDENTITY, DUPLICATE)
+- `matchFilename()` — match, unclear, and mismatch cases including
+  `income_certificate.pdf`, `college_document.pdf`, `document1.pdf`,
+  `IMG_8392.jpg`
+- `computeReadiness()` — READY / CONFIRM / NOT_READY truth table,
+  deadline-passed case, userConfirmed count
 
-Browser engines (`inspect.ts`, `transform.ts`) are excluded from the Vitest suite because they require a real browser canvas and PDF worker — test them manually via the golden path above.
+Browser engines (`inspect.ts`, `transform.ts`) are excluded from the Vitest
+suite because they require a real browser canvas and PDF worker — test them via
+the golden path above.
 
 ---
 
@@ -254,9 +273,9 @@ Browser engines (`inspect.ts`, `transform.ts`) are excluded from the Vitest suit
 
 Production build sets:
 
-```
+```text
 Content-Security-Policy: default-src 'self'; connect-src 'self'; img-src 'self' blob: data:;
-                          worker-src 'self' blob:; script-src 'self' 'unsafe-inline';
+                          worker-src 'self' blob:; script-src 'self' 'unsafe-inline'  (unsafe-eval only in development);
                           style-src 'self' 'unsafe-inline'; font-src 'self' data:;
                           object-src 'none'; frame-ancestors 'none'
 X-Content-Type-Options: nosniff
@@ -265,15 +284,19 @@ X-Frame-Options: DENY
 Permissions-Policy: camera=(), microphone=(), geolocation=()
 ```
 
-No third-party scripts. No analytics. No fonts loaded from Google or CDN.
+No third-party scripts. No analytics. No external fonts loaded from Google or
+any CDN.
 
 ---
 
 ## Limitations
 
-- Checks only the requirements configured in its demo templates — not the real requirements of any portal.
-- Filename matching is heuristic (token-based); unusual naming can produce false unclear/mismatch results.
-- PDFs that must remain PDFs cannot be automatically shrunk — only format-converted (PDF → JPG).
+- Checks only the requirements configured in its demo templates — not the real
+  requirements of any portal.
+- Filename matching is heuristic (token-based); unusual naming can produce
+  false unclear/mismatch results.
+- PDFs that must remain PDFs cannot be automatically shrunk — only
+  format-converted (PDF → JPG).
 - No OCR, no content analysis, no AI of any kind.
 - All state is in memory — refreshing the page clears everything immediately.
 
@@ -281,13 +304,17 @@ No third-party scripts. No analytics. No fonts loaded from Google or CDN.
 
 ## Privacy
 
-- **Files never leave your device.** Inspection, compression, and conversion all run locally via Web APIs.
-- **No storage of any kind.** No localStorage, no IndexedDB, no cookies. Refresh = clean slate.
+- **Files never leave your device.** Inspection, compression, and conversion
+  all run locally via Web APIs.
+- **No storage of any kind.** No localStorage, no IndexedDB, no cookies.
+  Refresh = clean slate.
 - **No account, no analytics, no third-party scripts.**
-- **SHA-256 is computed client-side** (`crypto.subtle`) for duplicate detection only — never transmitted.
+- **SHA-256 is computed client-side** (`crypto.subtle`) for duplicate
+  detection only — never transmitted.
 
 ---
 
 ## Disclaimer
 
-FORMGUARD checks the requirements configured for this application. It does not guarantee acceptance by the receiving organization.
+FORMGUARD checks the requirements configured for this application. It does not
+guarantee acceptance by the receiving organization.
