@@ -125,6 +125,13 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
   loadingSlots: new Set<string>(),
 
   selectTemplate(template) {
+    // Guard against a dispatch re-entering this action (e.g. the
+    // on-click handler in the template list). Without it, zustand would
+    // schedule another set on the same action, producing the
+    // "Maximum update depth exceeded" loop.
+    if (this?.template?.id === template.id) {
+      return;
+    }
     const slots: SlotState[] = template.documents.map((rule) => ({
       rule,
       issues: [],
@@ -136,6 +143,9 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
   },
 
   goToStep(step) {
+    if (this?.step === step) {
+      return;
+    }
     set({ step });
   },
 
