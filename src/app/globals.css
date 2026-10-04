@@ -19,12 +19,37 @@ body {
 
 /* Print styles for report */
 @media print {
-  body { background: white; }
+  body {
+    background: white;
+    margin: 0;
+    padding: 0;
+  }
+  /* Standard document page margins for the printed report */
+  @page {
+    margin: 12mm 14mm 14mm 14mm;
+    size: A4;
+  }
+  /* Neutralise screen-side padding on the report page when printing */
+  .print-page {
+    padding: 0 !important;
+    max-width: none !important;
+  }
   .no-print { display: none !important; }
   .print-only { display: block !important; }
+  /* Keep dial/green/red colours and background tints in the printed PDF */
+  .print-color-adjust { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Avoid awkward row/column breaks inside the report */
+  #report-content,
+  .readiness-dial,
+  .bg-white {
+    break-inside: avoid;
+  }
+  /* Keep the report tidy: repeat the header on each page is not needed for
+     short reports; ensure the document checklist rows don't split */
+  .divide-y {
+    break-before: avoid;
+  }
 }
-
-.print-only { display: none; }
 
 /* Focus visible globally */
 :focus-visible {
