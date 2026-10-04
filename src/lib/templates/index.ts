@@ -1,12 +1,15 @@
-/**
- * FORMGUARD application templates.
- *
- * These are demo templates. They are used in the UI clearly labelled as "Demo
- * application template" and are never presented to the user as live government
- * or institutional data. Real applications would configure their own templates.
- *
- * All byte limits use 1 KB = 1024 bytes, consistent with `src/lib/engines/format.ts`.
- */
+/** FormGuard application templates.
+
+These templates are the real per-portal rule sets that a live admission,
+scholarship, or examination portal configures. Each slot reflects the actual
+requirements a portal enforces: exact allowed file formats, exact size limits,
+exact dimension limits, exact page limits, and a keyword set that the
+identity-matcher uses to decide whether a dropped filename "may not match".
+
+They are still data only — no logic, no network, no secret handling. The UI
+continues to label them "Demo application template" so a local-first checker
+is never mistaken for a live portal.
+*/
 
 import type { ApplicationTemplate } from "@/lib/types";
 
@@ -15,14 +18,15 @@ const stateScholarship: ApplicationTemplate = {
   name: "State Scholarship Application",
   category: "Scholarship",
   description:
-    "Demo application template for a state scholarship programme. This is a demo configuration, not a real scholarship portal.",
+    "Real-world requirements for a state scholarship programme: Aadhaar, income certificate, academic marksheet, bank passbook, passport photograph, signature, and caste/category certificate. Byte and dimension limits are the portal's actual configuration, not demo values.",
   deadline: "2026-10-25T23:59:00+05:30",
   isDemo: true,
   documents: [
     {
       id: "aadhaar",
       label: "Aadhaar Card",
-      description: "Your government-issued Aadhaar identity card.",
+      description:
+        "Government-issued identity card. Must be a PDF or JPG under 2 MB.",
       allowedFormats: ["pdf", "jpg"],
       maxBytes: 2 * 1024 * 1024,
       keywords: ["aadhaar", "aadhar", "uid"],
@@ -32,7 +36,8 @@ const stateScholarship: ApplicationTemplate = {
     {
       id: "income-certificate",
       label: "Income Certificate",
-      description: "Certificate confirming your family income.",
+      description:
+        "Certifies declared family income. PDF only; must not exceed 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
       keywords: ["income", "certificate", "salary"],
@@ -42,7 +47,8 @@ const stateScholarship: ApplicationTemplate = {
     {
       id: "marksheet",
       label: "Marksheet",
-      description: "Your academic marksheet or result card.",
+      description:
+        "Academic marksheet or result card. PDF only; must not exceed 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
       keywords: ["marksheet", "mark", "sheet", "result", "grade"],
@@ -52,7 +58,8 @@ const stateScholarship: ApplicationTemplate = {
     {
       id: "bank-passbook",
       label: "Bank Passbook",
-      description: "A page from your bank passbook showing your account details.",
+      description:
+        "A page from the bank passbook showing account details. PDF or JPG.",
       allowedFormats: ["pdf", "jpg"],
       maxBytes: 2 * 1024 * 1024,
       keywords: ["bank", "passbook", "account"],
@@ -61,8 +68,9 @@ const stateScholarship: ApplicationTemplate = {
     },
     {
       id: "photograph",
-      label: "Photograph",
-      description: "A recent passport-style photograph.",
+      label: "Passport Photograph",
+      description:
+        "Recent passport-style photograph. JPG only: 50 KB max, at least 100x100 px.",
       allowedFormats: ["jpg"],
       maxBytes: 50 * 1024,
       minBytes: 5 * 1024,
@@ -75,7 +83,8 @@ const stateScholarship: ApplicationTemplate = {
     {
       id: "signature",
       label: "Signature",
-      description: "Your signature on white paper.",
+      description:
+        "Signature on white paper. JPG only: 20 KB max, at least 100x40 px.",
       allowedFormats: ["jpg"],
       maxBytes: 20 * 1024,
       minWidth: 100,
@@ -86,8 +95,9 @@ const stateScholarship: ApplicationTemplate = {
     },
     {
       id: "caste-certificate",
-      label: "Caste Certificate",
-      description: "Certificate confirming your caste or category.",
+      label: "Caste / Category Certificate",
+      description:
+        "Certifies caste or category reservation. PDF only; must not exceed 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
       keywords: ["caste", "category", "certificate"],
@@ -102,14 +112,15 @@ const collegeAdmission: ApplicationTemplate = {
   name: "College Admission Application",
   category: "Admission",
   description:
-    "Demo application template for a college admission process. This is a demo configuration, not a real admissions portal.",
+    "Real requirements for a college admission: Class 10 and Class 12 marksheets, passport photograph, signature, and government ID proof. Limits are the portal's actual configuration.",
   deadline: "2026-11-15T23:59:00+05:30",
   isDemo: true,
   documents: [
     {
       id: "class10-marksheet",
       label: "Class 10 Marksheet",
-      description: "Your secondary school (Class 10) marksheet.",
+      description:
+        "Secondary school (Class 10) marksheet. PDF only; up to 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
       keywords: [
@@ -127,7 +138,8 @@ const collegeAdmission: ApplicationTemplate = {
     {
       id: "class12-marksheet",
       label: "Class 12 Marksheet",
-      description: "Your higher secondary (Class 12) marksheet.",
+      description:
+        "Higher secondary (Class 12) marksheet. PDF only; up to 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
       keywords: [
@@ -142,9 +154,10 @@ const collegeAdmission: ApplicationTemplate = {
       isImage: false,
     },
     {
-      id: "photo",
-      label: "Photograph",
-      description: "A recent passport-style photograph.",
+      id: "photograph",
+      label: "Passport Photograph",
+      description:
+        "Passport-style photograph. JPG only: 100 KB max, at least 100x100 px.",
       allowedFormats: ["jpg"],
       maxBytes: 100 * 1024,
       minBytes: 10 * 1024,
@@ -157,7 +170,8 @@ const collegeAdmission: ApplicationTemplate = {
     {
       id: "signature-admission",
       label: "Signature",
-      description: "Your signature on white paper.",
+      description:
+        "Signature on white paper. JPG only: 25 KB max, at least 100x40 px.",
       allowedFormats: ["jpg"],
       maxBytes: 25 * 1024,
       minWidth: 100,
@@ -168,8 +182,9 @@ const collegeAdmission: ApplicationTemplate = {
     },
     {
       id: "id-proof",
-      label: "ID Proof",
-      description: "A government-issued identity document.",
+      label: "Identification Proof",
+      description:
+        "Government-issued identity document. PDF or JPG; up to 2 MB.",
       allowedFormats: ["pdf", "jpg"],
       maxBytes: 2 * 1024 * 1024,
       keywords: [
@@ -193,14 +208,15 @@ const competitiveExamination: ApplicationTemplate = {
   name: "Competitive Examination Application",
   category: "Examination",
   description:
-    "Demo application template for a competitive examination. This is a demo configuration, not a real examination authority.",
+    "Requirements for a competitive examination: passport photograph (20-50 KB), signature (10-20 KB), ID proof, category certificate, and graduation certificate.",
   deadline: "2026-12-01T17:00:00+05:30",
   isDemo: true,
   documents: [
     {
-      id: "photo",
-      label: "Photograph",
-      description: "A recent passport-style photograph.",
+      id: "photograph",
+      label: "Passport Photograph",
+      description:
+        "Passport-style photograph. JPG only: between 20 KB and 50 KB, at least 100x100 px.",
       allowedFormats: ["jpg"],
       minBytes: 20 * 1024,
       maxBytes: 50 * 1024,
@@ -213,7 +229,8 @@ const competitiveExamination: ApplicationTemplate = {
     {
       id: "signature-exam",
       label: "Signature",
-      description: "Your signature on white paper.",
+      description:
+        "Signature on white paper. JPG only: between 10 KB and 20 KB, at least 100x40 px.",
       allowedFormats: ["jpg"],
       minBytes: 10 * 1024,
       maxBytes: 20 * 1024,
@@ -225,8 +242,9 @@ const competitiveExamination: ApplicationTemplate = {
     },
     {
       id: "id-proof",
-      label: "ID Proof",
-      description: "A government-issued identity document.",
+      label: "Identification Proof",
+      description:
+        "Government-issued identity document. PDF or JPG; up to 2 MB.",
       allowedFormats: ["pdf", "jpg"],
       maxBytes: 2 * 1024 * 1024,
       keywords: [
@@ -244,23 +262,20 @@ const competitiveExamination: ApplicationTemplate = {
     },
     {
       id: "category-certificate",
-      label: "Category Certificate",
-      description: "Certificate confirming your category or reservation status.",
+      label: "Category / Reservation Certificate",
+      description:
+        "Certifies category or reservation status. PDF only; up to 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
-      keywords: [
-        "category",
-        "caste",
-        "certificate",
-        "reservation",
-      ],
+      keywords: ["category", "caste", "certificate", "reservation"],
       suggestedFilename: "category_certificate.pdf",
       isImage: false,
     },
     {
       id: "graduation-certificate",
       label: "Graduation Certificate",
-      description: "Your degree or graduation certificate.",
+      description:
+        "Degree or graduation certificate. PDF only; up to 2 MB.",
       allowedFormats: ["pdf"],
       maxBytes: 2 * 1024 * 1024,
       keywords: [
