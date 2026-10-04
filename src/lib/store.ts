@@ -101,6 +101,8 @@ interface FormguardState {
   /** Files dropped that could not be auto-assigned to any slot. */
   unassignedFiles: File[];
   step: Step;
+  /** Set of slot IDs currently being inspected or transformed. */
+  loadingSlots: Set<string>;
 
   // Actions
   selectTemplate: (template: ApplicationTemplate) => void;
@@ -120,6 +122,7 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
   slots: [],
   unassignedFiles: [],
   step: "landing",
+  loadingSlots: new Set<string>(),
 
   selectTemplate(template) {
     const slots: SlotState[] = template.documents.map((rule) => ({
@@ -137,22 +140,31 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
   },
 
   async addFile(file, slotId) {
-    const meta = await inspectFile(file);
-    const { slots } = get();
-    const updated = slots.map((s) => {
-      if (s.rule.id !== slotId) return s;
-      return {
-        ...s,
-        file,
-        meta,
-        confirmedIdentity: false,
-        history: [
-          ...s.history,
-          historyEntry("uploaded", `Uploaded "${file.name}" (${(file.size / 1024).toFixed(1)} KB)`),
-        ],
-      };
-    });
-    set({ slots: revalidateAll(updated) });
+    set((s) => ({ loadingSlots: new Set([...s.loadingSlots, slotId]) }));
+    try {
+      const meta = await inspectFile(file);
+      const { slots } = get();
+      const updated = slots.map((s) => {
+        if (s.rule.id !== slotId) return s;
+        return {
+          ...s,
+          file,
+          meta,
+          confirmedIdentity: false,
+          history: [
+            ...s.history,
+            historyEntry("uploaded", `Uploaded "${file.name}" (${(file.size / 1024).toFixed(1)} KB)`),
+          ],
+        };
+      });
+      set({ slots: revalidateAll(updated) });
+    } finally {
+      set((s) => {
+        const next = new Set(s.loadingSlots);
+        next.delete(slotId);
+        return { loadingSlots: next };
+      });
+    }
   },
 
   async addFiles(files) {
@@ -191,11 +203,55 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
       }
     }
 
-    // Inspect & apply updates
-    let updatedSlots = slots;
-    for (const { slotId, file } of updates) {
+    // Mark all target slots as loading immediately
+    const targetSlotIds = updates.map((u) => u.slotId);
+    set((s) => ({ loadingSlots: new Set([...s.loadingSlots, ...targetSlotIds]) }));
+
+    try {
+      // Inspect & apply updates
+      let updatedSlots = slots;
+      for (const { slotId, file } of updates) {
+        const meta = await inspectFile(file);
+        updatedSlots = updatedSlots.map((s) => {
+          if (s.rule.id !== slotId) return s;
+          return {
+            ...s,
+            file,
+            meta,
+            confirmedIdentity: false,
+            history: [
+              ...s.history,
+              historyEntry("uploaded", `Uploaded "${file.name}" (${(file.size / 1024).toFixed(1)} KB)`),
+            ],
+          };
+        });
+        // Clear loading for this slot as soon as it's done
+        set((s) => {
+          const next = new Set(s.loadingSlots);
+          next.delete(slotId);
+          return { loadingSlots: next };
+        });
+      }
+
+      set({
+        slots: revalidateAll(updatedSlots),
+        unassignedFiles: [...get().unassignedFiles, ...unassigned],
+      });
+    } finally {
+      set((s) => {
+        const next = new Set(s.loadingSlots);
+        targetSlotIds.forEach((id) => next.delete(id));
+        return { loadingSlots: next };
+      });
+    }
+  },
+
+  async replaceFile(file, slotId) {
+    set((s) => ({ loadingSlots: new Set([...s.loadingSlots, slotId]) }));
+    try {
       const meta = await inspectFile(file);
-      updatedSlots = updatedSlots.map((s) => {
+      const { slots } = get();
+      const updated = slots.map((s) => {
         if (s.rule.id !== slotId) return s;
         return {
           ...s,
@@ -204,35 +260,18 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
           confirmedIdentity: false,
           history: [
             ...s.history,
-            historyEntry("uploaded", `Uploaded "${file.name}" (${(file.size / 1024).toFixed(1)} KB)`),
+            historyEntry("replaced", `Replaced with "${file.name}" (${(file.size / 1024).toFixed(1)} KB)`),
           ],
         };
       });
+      set({ slots: revalidateAll(updated) });
+    } finally {
+      set((s) => {
+        const next = new Set(s.loadingSlots);
+        next.delete(slotId);
+        return { loadingSlots: next };
+      });
     }
-
-    set({
-      slots: revalidateAll(updatedSlots),
-      unassignedFiles: [...get().unassignedFiles, ...unassigned],
-    });
-  },
-
-  async replaceFile(file, slotId) {
-    const meta = await inspectFile(file);
-    const { slots } = get();
-    const updated = slots.map((s) => {
-      if (s.rule.id !== slotId) return s;
-      return {
-        ...s,
-        file,
-        meta,
-        confirmedIdentity: false,
-        history: [
-          ...s.history,
-          historyEntry("replaced", `Replaced with "${file.name}" (${(file.size / 1024).toFixed(1)} KB)`),
-        ],
-      };
-    });
-    set({ slots: revalidateAll(updated) });
   },
 
   removeFile(slotId) {
@@ -269,57 +308,65 @@ export const useFormguardStore = create<FormguardState>()((set, get) => ({
   },
 
   async applyFix(slotId) {
-    const { slots } = get();
-    const slot = slots.find((s) => s.rule.id === slotId);
-    if (!slot?.file || !slot.meta) return;
+    set((s) => ({ loadingSlots: new Set([...s.loadingSlots, slotId]) }));
+    try {
+      const { slots } = get();
+      const slot = slots.find((s) => s.rule.id === slotId);
+      if (!slot?.file || !slot.meta) return;
 
-    const issue = slot.issues.find((i) => i.fix != null);
-    if (!issue?.fix) return;
+      const issue = slot.issues.find((i) => i.fix != null);
+      if (!issue?.fix) return;
 
-    let result: { file: File; summary: string };
+      let result: { file: File; summary: string };
 
-    if (issue.fix === "compress") {
-      if (slot.meta.realType === "pdf") {
-        // PDF that needs conversion to JPG first
-        result = await pdfToJpeg(slot.file, slot.rule);
+      if (issue.fix === "compress") {
+        if (slot.meta.realType === "pdf") {
+          result = await pdfToJpeg(slot.file, slot.rule);
+        } else {
+          result = await compressImage(slot.file, slot.rule);
+        }
+      } else if (issue.fix === "resize") {
+        result = await resizeImage(slot.file, slot.rule);
+      } else if (issue.fix === "convert") {
+        if (slot.meta.realType === "pdf") {
+          result = await pdfToJpeg(slot.file, slot.rule);
+        } else {
+          result = await convertToJpeg(slot.file, slot.rule);
+        }
+      } else if (issue.fix === "rename") {
+        result = renameFile(slot.file, slot.rule.suggestedFilename);
       } else {
-        result = await compressImage(slot.file, slot.rule);
+        return;
       }
-    } else if (issue.fix === "resize") {
-      result = await resizeImage(slot.file, slot.rule);
-    } else if (issue.fix === "convert") {
-      if (slot.meta.realType === "pdf") {
-        result = await pdfToJpeg(slot.file, slot.rule);
-      } else {
-        result = await convertToJpeg(slot.file, slot.rule);
-      }
-    } else if (issue.fix === "rename") {
-      result = renameFile(slot.file, slot.rule.suggestedFilename);
-    } else {
-      return;
+
+      const kind: HistoryKind =
+        issue.fix === "compress"
+          ? "compressed"
+          : issue.fix === "resize"
+            ? "resized"
+            : issue.fix === "convert"
+              ? "converted"
+              : "renamed";
+
+      const newMeta = await inspectFile(result.file);
+      const updated = get().slots.map((s) => {
+        if (s.rule.id !== slotId) return s;
+        return {
+          ...s,
+          file: result.file,
+          meta: newMeta,
+          confirmedIdentity: s.confirmedIdentity,
+          history: [...s.history, historyEntry(kind, result.summary)],
+        };
+      });
+      set({ slots: revalidateAll(updated) });
+    } finally {
+      set((s) => {
+        const next = new Set(s.loadingSlots);
+        next.delete(slotId);
+        return { loadingSlots: next };
+      });
     }
-
-    const kind: HistoryKind =
-      issue.fix === "compress"
-        ? "compressed"
-        : issue.fix === "resize"
-          ? "resized"
-          : issue.fix === "convert"
-            ? "converted"
-            : "renamed";
-
-    const newMeta = await inspectFile(result.file);
-    const updated = slots.map((s) => {
-      if (s.rule.id !== slotId) return s;
-      return {
-        ...s,
-        file: result.file,
-        meta: newMeta,
-        confirmedIdentity: s.confirmedIdentity,
-        history: [...s.history, historyEntry(kind, result.summary)],
-      };
-    });
-    set({ slots: revalidateAll(updated) });
   },
 
   async applyAllSafeFixes() {
