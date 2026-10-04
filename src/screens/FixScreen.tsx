@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useFormguardStore } from "@/lib/store";
+import { useShallow } from "zustand/react/shallow";
 import { Stepper, Disclaimer } from "@/components/ui";
 import { toast } from "@/components/Toast";
 import { formatBytes } from "@/lib/engines/format";
@@ -61,12 +62,14 @@ interface FixCardProps {
 }
 
 function FixCard({ slot }: FixCardProps) {
-  const { applyFix, confirmIdentity, replaceFile, loadingSlots } = useFormguardStore((s) => ({
-    applyFix: s.applyFix,
-    confirmIdentity: s.confirmIdentity,
-    replaceFile: s.replaceFile,
-    loadingSlots: s.loadingSlots,
-  }));
+  const { applyFix, confirmIdentity, replaceFile, loadingSlots } = useFormguardStore(
+    useShallow((s) => ({
+      applyFix: s.applyFix,
+      confirmIdentity: s.confirmIdentity,
+      replaceFile: s.replaceFile,
+      loadingSlots: s.loadingSlots,
+    })),
+  );
 
   const isLoading = loadingSlots.has(slot.rule.id);
   const [error, setError] = useState<string | null>(null);
@@ -226,13 +229,13 @@ function FixCard({ slot }: FixCardProps) {
 
 export function FixScreen() {
   const { template, slots, goToStep, applyAllSafeFixes, loadingSlots } = useFormguardStore(
-    (s) => ({
+    useShallow((s) => ({
       template: s.template,
       slots: s.slots,
       goToStep: s.goToStep,
       applyAllSafeFixes: s.applyAllSafeFixes,
       loadingSlots: s.loadingSlots,
-    }),
+    })),
   );
 
   const [applyingAll, setApplyingAll] = useState(false);

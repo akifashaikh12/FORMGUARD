@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useFormguardStore } from "@/lib/store";
 import { Stepper, StatusBadge, DeadlineChip, Disclaimer } from "@/components/ui";
 import { toast } from "@/components/Toast";
@@ -73,12 +74,14 @@ interface DocumentCardProps {
 }
 
 function DocumentCard({ slot, isLoading }: DocumentCardProps) {
-  const { addFile, removeFile, confirmIdentity, applyFix } = useFormguardStore((s) => ({
-    addFile: s.addFile,
-    removeFile: s.removeFile,
-    confirmIdentity: s.confirmIdentity,
-    applyFix: s.applyFix,
-  }));
+  const { addFile, removeFile, confirmIdentity, applyFix } = useFormguardStore(
+    useShallow((s) => ({
+      addFile: s.addFile,
+      removeFile: s.removeFile,
+      confirmIdentity: s.confirmIdentity,
+      applyFix: s.applyFix,
+    })),
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -349,14 +352,16 @@ function ProgressBar({
 
 export function UploadScreen() {
   const { template, slots, loadingSlots, goToStep, addFiles, reset } =
-    useFormguardStore((s) => ({
-      template: s.template,
-      slots: s.slots,
-      loadingSlots: s.loadingSlots,
-      goToStep: s.goToStep,
-      addFiles: s.addFiles,
-      reset: s.reset,
-    }));
+    useFormguardStore(
+      useShallow((s) => ({
+        template: s.template,
+        slots: s.slots,
+        loadingSlots: s.loadingSlots,
+        goToStep: s.goToStep,
+        addFiles: s.addFiles,
+        reset: s.reset,
+      })),
+    );
 
   const [loadingDemo, setLoadingDemo] = useState(false);
   const [globalDragging, setGlobalDragging] = useState(false);

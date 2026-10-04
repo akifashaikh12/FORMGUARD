@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormguardStore } from "@/lib/store";
+import { useShallow } from "zustand/react/shallow";
 import { ReadinessDial, DeadlineChip, Disclaimer } from "@/components/ui";
 import { computeReadiness } from "@/lib/engines/readiness";
 import { now } from "@/lib/clock";
@@ -86,12 +87,14 @@ function SlotRow({ slot, index }: SlotRowProps) {
 // ── Readiness screen ──────────────────────────────────────────────────────────
 
 export function ReadinessScreen() {
-  const { template, slots, goToStep, reset } = useFormguardStore((s) => ({
-    template: s.template,
-    slots: s.slots,
-    goToStep: s.goToStep,
-    reset: s.reset,
-  }));
+  const { template, slots, goToStep, reset } = useFormguardStore(
+    useShallow((s) => ({
+      template: s.template,
+      slots: s.slots,
+      goToStep: s.goToStep,
+      reset: s.reset,
+    })),
+  );
 
   if (!template) return null;
 

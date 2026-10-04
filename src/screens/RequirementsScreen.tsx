@@ -1,17 +1,20 @@
 "use client";
 
 import { useFormguardStore } from "@/lib/store";
+import { useShallow } from "zustand/react/shallow";
 import { Stepper, DeadlineChip, Disclaimer } from "@/components/ui";
 import { computeReadiness } from "@/lib/engines/readiness";
 import { now } from "@/lib/clock";
 import { FileText, Image as ImageIcon } from "lucide-react";
 
 export function RequirementsScreen() {
-  const { template, slots, goToStep } = useFormguardStore((s) => ({
-    template: s.template,
-    slots: s.slots,
-    goToStep: s.goToStep,
-  }));
+  const { template, slots, goToStep } = useFormguardStore(
+    useShallow((s) => ({
+      template: s.template,
+      slots: s.slots,
+      goToStep: s.goToStep,
+    })),
+  );
 
   if (!template) return null;
 

@@ -5,11 +5,15 @@ import { templates } from "@/lib/templates";
 import { Disclaimer } from "@/components/ui";
 import { Calendar, FileText } from "lucide-react";
 
+import { useShallow } from "zustand/react/shallow";
+
 export function SelectScreen() {
-  const { selectTemplate, goToStep } = useFormguardStore((s) => ({
-    selectTemplate: s.selectTemplate,
-    goToStep: s.goToStep,
-  }));
+  const { selectTemplate, goToStep } = useFormguardStore(
+    useShallow((s) => ({
+      selectTemplate: s.selectTemplate,
+      goToStep: s.goToStep,
+    })),
+  );
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
